@@ -1,0 +1,57 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ post.title }}</h1>
+<p class="date">
+    Published {{ post.publish }} by {{ post.author }}
+</p>
+<a href="{% url 'post_edit' pk=post.pk %}">Edit post</a> | <a href="{% url 'post_delete' pk=post.pk %}">Delete post</a>
+
+{{ post.body|linebreaks }}
+
+{% with comments.count as total_comments %}
+    <h2>
+        {{ total_comments }} comment {{total_comments|pluralize}}
+    </h2>
+{% endwith %}
+
+{% for comment in comments %}
+    <div class='comment'new_comme>
+        <p class='info'>
+            Comment {{ forloop.counter }} by {{ comment.author }}
+            {{ comment.created_at }}
+        </p>
+        {{ comment.body|linebreaks }}
+        <form method="POST">
+            {% csrf_token %}
+            <a href="{% url 'comment_delete' pk=comment.pk %}">Delete comment</a>
+            {% if request.user.is_authenticated %}
+            {% endif %}
+        </form>
+    </div>
+
+{% empty %}
+    <p>There are no comments yet.</p>
+{% endfor %}
+
+{% if new_comment %}
+    <h2>Your comment has been added.</h2>
+{% else %}
+    <h2>Add new comment.</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <p><input type="submit" value='Add'></p>
+    </form>
+{% endif %}
+{% for post in simmilst_posts %}
+<p>
+    <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+</p>
+{% empty %}
+There are no similar posts.
+{% endfor %} 
+
+{% endblock %}
